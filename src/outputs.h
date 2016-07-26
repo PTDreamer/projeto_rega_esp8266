@@ -11,7 +11,6 @@ public:
   static void enableAuxPump();
   static void disableAuxPump();
   static void setAuxPumpDelay(int);
-private:
-  static int m_aux_pump_delay;
+  static String getOutputs();
 };
 #endif
