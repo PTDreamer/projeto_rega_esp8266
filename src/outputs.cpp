@@ -23,11 +23,11 @@ void outputs::disableChannelB() {
 }
 void outputs::enableAuxPump() {
   Serial.println("pump enable");
-  digitalWrite(16, HIGH);
+  digitalWrite(12, HIGH);
 }
 void outputs::disableAuxPump() {
   Serial.println("pump disable");
-  digitalWrite(16, LOW);
+  digitalWrite(12, LOW);
 }
 
 String outputs::getOutputs() {
@@ -44,7 +44,7 @@ String outputs::getOutputs() {
   } else {
     zb = "off";
   }
-  if(digitalRead(16) == HIGH) {
+  if(digitalRead(12) == HIGH) {
     zp = "on";
   } else {
     zp = "off";

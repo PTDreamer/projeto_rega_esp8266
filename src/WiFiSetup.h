@@ -1,12 +1,11 @@
 #ifndef WiFiSetup_H
 #define WiFiSetup_H
+#include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
 
 class WiFiSetup
 {
 public:
-	static void begin(void){WiFiSetup::begin("SistemaRega");}
-	static void begin(char const *ssid,const char *passwd=NULL);
-	static void beginAP(char const *ssid,const char *passwd=NULL);
+	static bool begin(char const *ssid,const char *passwd=NULL);
 };
 
 #endif

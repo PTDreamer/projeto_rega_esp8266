@@ -1,4 +1,3 @@
-#include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
 
 //needed for library
 #include <DNSServer.h>
@@ -8,10 +7,10 @@
 
 
 
-void WiFiSetup::begin(char const *ssid,const char *passwd)
+bool WiFiSetup::begin(char const *ssid,const char *passwd)
 {
-
 	WiFiManager wifiManager;
+  wifiManager.setConfigPortalTimeout(180);
 	#if SerialDebug != true
 	wifiManager.setDebugOutput(false);
 	#endif
@@ -20,24 +19,6 @@ void WiFiSetup::begin(char const *ssid,const char *passwd)
 
     //set custom ip for portal
     //and goes into a blocking loop awaiting configuration
-    wifiManager.autoConnect(ssid,passwd);
-    //or use this for auto generated name ESP + ChipID
-}
-
-void WiFiSetup::beginAP(char const *ssid,const char *passwd)
-{
-
-	WiFiManager wifiManager;
-
-	#if SerialDebug != true
-	wifiManager.setDebugOutput(false);
-	#endif
-
-    //reset saved settings
-    //wifiManager.resetSettings();
-
-    //set custom ip for portal
-    //and goes into a blocking loop awaiting configuration
-    wifiManager.startConfigPortal(ssid,passwd);
+    return wifiManager.autoConnect(ssid,passwd);
     //or use this for auto generated name ESP + ChipID
 }

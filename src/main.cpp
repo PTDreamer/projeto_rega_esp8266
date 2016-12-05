@@ -1,26 +1,21 @@
-
-#define ONLINE_UPDATE_PATH "/update"
-
 #include <Arduino.h>
 #include <Hash.h>
 #include "fileHandling.h"
 #include <ESP8266WiFi.h>
 #include <DNSServer.h>
-#include <WiFiSetup.h>
 #include <ArduinoJson.h>
-#include "ntp.h"
 #include "outputs.h"
 #include "ESPAsyncWebServer.h"
+#include <WiFiSetup.h>
 #include <ESP8266mDNS.h>
-#include "ESPUpdateServer.h"
-#include "HttpUpdateHandler.h"
 #include <ArduinoOTA.h>
 #include "log.h"
-NTP ntp;
+#include "time.h"
+
 AsyncWebServer server(80);
 fileHandling filehandler;
 time_t getNtpTime() {
-  return ntp.getNtpTime();
+  return time(NULL);
 }
 volatile bool schedulesUpdated = true;
 void setupArduinoOTA() {
@@ -53,7 +48,7 @@ void setupArduinoOTA() {
 void schedulesBodyHandler(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
   if(request->method() == HTTP_POST && request->url() == "/data/schedules.json") {
     if(!index)
-    Serial.printf("BodyStart: %u\n", total);
+      Serial.printf("BodyStart: %u\n", total);
     Serial.printf("%s", (const char*)data);
     DynamicJsonBuffer jsonBuffer;
     JsonObject& root = jsonBuffer.parseObject((const char*)data);
@@ -91,65 +86,28 @@ void schedulesBodyHandler(AsyncWebServerRequest *request, uint8_t *data, size_t 
     return;
   }
 }
-//online updating
-HttpUpdateHandler httpUpdateHandler("","");
-struct bootflags
-{
-    unsigned char raw_rst_cause : 4;
-    unsigned char raw_bootdevice : 4;
-    unsigned char raw_bootmode : 4;
-
-    unsigned char rst_normal_boot : 1;
-    unsigned char rst_reset_pin : 1;
-    unsigned char rst_watchdog : 1;
-
-    unsigned char bootdevice_ram : 1;
-    unsigned char bootdevice_flash : 1;
-};
-struct bootflags bootmode_detect(void) {
-    int reset_reason, bootmode;
-    asm (
-        "movi %0, 0x60000600\n\t"
-        "movi %1, 0x60000200\n\t"
-        "l32i %0, %0, 0x114\n\t"
-        "l32i %1, %1, 0x118\n\t"
-        : "+r" (reset_reason), "+r" (bootmode) /* Outputs */
-        : /* Inputs (none) */
-        : "memory" /* Clobbered */
-    );
-
-    struct bootflags flags;
-
-    flags.raw_rst_cause = (reset_reason&0xF);
-    flags.raw_bootdevice = ((bootmode>>0x10)&0x7);
-    flags.raw_bootmode = ((bootmode>>0x1D)&0x7);
-
-    flags.rst_normal_boot = flags.raw_rst_cause == 0x1;
-    flags.rst_reset_pin = flags.raw_rst_cause == 0x2;
-    flags.rst_watchdog = flags.raw_rst_cause == 0x4;
-
-    flags.bootdevice_ram = flags.raw_bootdevice == 0x1;
-    flags.bootdevice_flash = flags.raw_bootdevice == 0x3;
-
-    return flags;
-}
 
 void setup() {
   pinMode(13, OUTPUT);
   pinMode(14, OUTPUT);
-  pinMode(16, OUTPUT);
+  pinMode(12, OUTPUT);
   digitalWrite(13, LOW);
   digitalWrite(14, LOW);
-  digitalWrite(16, LOW);
+  digitalWrite(12, LOW);
 
   Serial.begin(115200);
   Serial.println("Start!");
-  WiFiSetup::begin();
+
+  if(!WiFiSetup::begin("AlarmeConfig")) {
+    Serial.println("failed to connect and hit timeout");
+    ESP.reset();
+    delay(1000);
+  }
   uint8_t mdnssuccess = MDNS.begin("rega");
-  ntp.setupNTP();
   setSyncProvider(getNtpTime);
   setSyncInterval(1 * 60);
 
+  configTime(3600, 0, "us.pool.ntp.org");
   Serial.print("Connected to access point! IP Address=");
   Serial.print(WiFi.localIP());
 
@@ -160,18 +118,12 @@ void setup() {
   } else {
     Serial.println("failed to mount FS");
   }
-    //0:
-  //1: normal boot
-  //2: reset pin
-  //3: software reset
-  //4: watchdog reset - See more at: http://www.esp8266.com/viewtopic.php?p=2096#p2112
-  bootflags flag = bootmode_detect();
-  String reboot = String("REBOOT CAUSE:") + String(flag.raw_bootdevice);
+  log::writeLog(ESP.getResetReason());
+  log::writeLog(ESP.getResetInfo());
   if(!mdnssuccess) {
-    reboot = reboot + ("\nFailed to start mDNS");
+    log::writeLog("Failed to start mDNS");
   }
-  log::writeLog(reboot);
-  if(!SPIFFS.exists("/www/data/schedules.json")) {
+  if(!SPIFFS.exists("/data/schedules.json")) {
     File f = SPIFFS.open("/www/data/schedules.json", "w");
     f.println("{\"schedules\": [],\"pump_delay\":0}");
     f.close();
@@ -247,12 +199,9 @@ void setup() {
     Serial.println("Request for not found");
     request->send(404);
   });
-  httpUpdateHandler.setUrl(ONLINE_UPDATE_PATH);
-  httpUpdateHandler.setVersion("0","0");
-  server.addHandler(&httpUpdateHandler);
+
   server.begin();
   MDNS.addService("http", "tcp", 80);
-  ESPUpdateServer_setup();
 
   setupArduinoOTA();
   ArduinoOTA.begin();
@@ -260,11 +209,10 @@ void setup() {
 
 void loop() {
   log::writeToFile();
-  ESPUpdateServer_loop();
   ArduinoOTA.handle();
 
   Alarm.delay(0);
-  if(schedulesUpdated) {
+  if(schedulesUpdated && (timeStatus() == timeSet)) {
     filehandler.handleScheduleFile();
     schedulesUpdated = false;
   }
