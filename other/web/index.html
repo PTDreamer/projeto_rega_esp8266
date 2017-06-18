@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="ESP8266 Controlador de Rega" content="">
+        <meta name="JB" content="">
+        <title>Controlador de Rega</title>
+        <!-- Bootstrap theme -->
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" <!-- custom styles for this template -->
+        <link href="theme.css" rel="stylesheet">
+        <link href="sticky-footer-navbar.css" rel="stylesheet">
+        <link type="text/css" href="css/bootstrap-timepicker.min.css" />
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    </head>
+    <body role="document">
+        <!-- Fixed navbar -->
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">
+                        <img alt="Brand" src="images/irrigation.png">
+                    </a>
+                </div>
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li class="active">
+                            <a href="#">Home</a>
+                        </li>
+                        <li>
+                            <a href="status.html">Status</a>
+                        </li>
+                        <li>
+                            <a href="log.html">Log</a>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <p id="timedisplay" class="navbar-text">00:00</p>
+                    </ul>
+                </div>
+                <!-- /.navbar-collapse -->
+            </div>
+            <!-- /.container-fluid -->
+        </nav>
+        <div class="container theme-showcase maincontainer" role="main"> 
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Horarios<br></h3>
+                </div>
+                <div class="panel-body">
+                    <table class="table"> 
+                        <thead> 
+                            <tr> 
+                                <th>Zona</th> 
+                                <th>Hora de Ativacao</th> 
+                                <th>Tempo Ativado</th> 
+                                <th>Apagar</th>
+                            </tr>
+                        </thead>                         
+                        <tbody id="tablebody"> 
+                            <tr id="rowtemplate" style="display: none;"> 
+                                <td>
+                                    <select class="form-control zone"> 
+                                        <option>Zona A</option>                                         
+                                        <option>Zona B</option>                                         
+                                    </select>                                     
+                                </td>                                 
+                                <td> 
+                                    <div class="time form-group bootstrap-timepicker">
+                                        <input type="text" class="form-control input-small timepicker timepickeri">
+                                    </div>
+                                </td>                                 
+                                <td>
+                                    <div class="form-group durationparent">
+                                        <input class="duration form-control" type="number" min="1" step="1" />
+                                    </div>
+                                </td>                                 
+                                <td>
+                                    <button class="delete">
+                                        <span class="glyphicon glyphicon-remove-sign"></span>
+                                    </button>
+                                </td>                                 
+                            </tr>                             
+                        </tbody>
+                    </table>
+                    <div class="form-group">
+                        <label class="control-label" for="formInput38">Atraso de ligacao de bomba auxiliar</label>
+                        <input type="text" class="form-control has-error has-feedback" id="pumpdelay" placeholder="Atraso de ligacao de bomba auxiliar">
+                    </div>
+                    <div class="form=group">
+                        <div class="btn-group"> 
+                            <button id="newline" type="button" class="btn btn-default">Nova Linha</button>                             
+                            <button id="save" type="button" class="btn btn-default">Gravar</button>
+                        </div>
+                    </div>                     
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Funcoes de Teste<br></h3>
+                </div>
+                <div class="panel-body">
+                    <div class="form=group">
+                        <div class="btn-group"> 
+                            <button id="zonaa" type="button" class="btn btn-default">Ligar Zona A</button>                             
+                            <button id="zonab" type="button" class="btn btn-default">Ligar Zona B</button>
+                            <button id="pump" type="button" class="btn btn-default">Ligar Bomba</button>
+                        </div>
+                    </div>                     
+                </div>
+            </div>
+        </div>
+        <footer class="footer">
+            <div class="container">
+                <p class="text-muted">JAB Webdesign ( Jose e Alice WebDesign :) )</p>
+            </div>
+        </footer>
+        <!-- /container -->
+        <!-- Bootstrap core JavaScript
+    ================================================== -->
+        <!-- Placed at the end of the document so the pages load faster -->
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.4.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+        <script src="assets/js/ie10-viewport-bug-workaround.js"></script>
+        <script type="text/javascript" src="assets/js/bootstrap-timepicker.min.js"></script>
+        <script src="assets/js/main.js"></script>
+    </body>
+</html>
