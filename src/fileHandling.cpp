@@ -30,7 +30,7 @@ bool fileHandling::handleScheduleFile() {
     Alarm.free(i);
   }
   int PumpDelay(root["pump_delay"].as<int>());
-  JsonArray& array = root["schedules"].asArray();
+  JsonArray& array = root["schedules"].as<JsonArray>();
   int number = 0;
   String ids;
   for(JsonArray::iterator it=array.begin(); it!=array.end(); ++it)

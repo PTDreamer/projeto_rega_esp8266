@@ -67,7 +67,7 @@ void schedulesBodyHandler(AsyncWebServerRequest *request, uint8_t *data, size_t 
       request->send(response);
       return;
     }
-    JsonArray& array = root["schedules"].asArray();
+    JsonArray& array = root["schedules"].as<JsonArray>();
     if (!array.success())
     {
     //  Serial.println("schedules array failed");
@@ -97,13 +97,13 @@ void setup() {
 
   Serial.begin(115200);
   Serial.println("Start!");
+  WiFi.hostname("rega2");
 
-  if(!WiFiSetup::begin("AlarmeConfig")) {
+  if(!WiFiSetup::begin("RegaConfig")) {
     Serial.println("failed to connect and hit timeout");
     ESP.reset();
     delay(1000);
   }
-  uint8_t mdnssuccess = MDNS.begin("rega");
   setSyncProvider(getNtpTime);
   setSyncInterval(1 * 60);
 
@@ -120,9 +120,7 @@ void setup() {
   }
   log::writeLog(ESP.getResetReason());
   log::writeLog(ESP.getResetInfo());
-  if(!mdnssuccess) {
-    log::writeLog("Failed to start mDNS");
-  }
+
   if(!SPIFFS.exists("/data/schedules.json")) {
     File f = SPIFFS.open("/www/data/schedules.json", "w");
     f.println("{\"schedules\": [],\"pump_delay\":0}");
@@ -201,7 +199,6 @@ void setup() {
   });
 
   server.begin();
-  MDNS.addService("http", "tcp", 80);
 
   setupArduinoOTA();
   ArduinoOTA.begin();

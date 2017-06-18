@@ -11,9 +11,7 @@ bool WiFiSetup::begin(char const *ssid,const char *passwd)
 {
 	WiFiManager wifiManager;
   wifiManager.setConfigPortalTimeout(180);
-	#if SerialDebug != true
-	wifiManager.setDebugOutput(false);
-	#endif
+	wifiManager.setDebugOutput(true);
     //reset saved settings
   //  wifiManager.resetSettings();
 
