@@ -1,0 +1,46 @@
+{
+    "description": "WiFi and OTA manager for ESP8266", 
+    "repository": {
+        "url": "https://github.com/sticilface/ESPmanager", 
+        "type": "git"
+    }, 
+    "platforms": [
+        "atmelavr", 
+        "atmelsam", 
+        "espressif8266", 
+        "intel_arc32", 
+        "microchippic32", 
+        "nordicnrf51", 
+        "teensy", 
+        "timsp430"
+    ], 
+    "export": {
+        "exclude": [
+            "extras", 
+            "docs", 
+            "tests", 
+            "test", 
+            "*.doxyfile", 
+            "*.pdf"
+        ], 
+        "include": null
+    }, 
+    "authors": [
+        {
+            "maintainer": true, 
+            "name": "Andrew Melvin", 
+            "url": null, 
+            "email": "Sticilface"
+        }
+    ], 
+    "keywords": [
+        "uncategorized"
+    ], 
+    "id": 1480, 
+    "name": "ESPManager", 
+    "frameworks": [
+        "arduino"
+    ], 
+    "version": "1.0", 
+    "homepage": null
+}
