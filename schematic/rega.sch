@@ -20785,6 +20785,7 @@ Devices GSMBAxx and GMSTBVxx transferred from con-phoenix-508.lbr&lt;br&gt;
 <part name="/.9" library="supply1" deviceset="0V" device=""/>
 <part name="R9" library="rcl" deviceset="R-EU_" device="R0805" value="10K"/>
 <part name="+3V8" library="supply1" deviceset="+3V3" device=""/>
+<part name="R10" library="rcl" deviceset="R-EU_" device="R0805" value="10K"/>
 </parts>
 <sheets>
 <sheet>
@@ -20896,6 +20897,7 @@ Devices GSMBAxx and GMSTBVxx transferred from con-phoenix-508.lbr&lt;br&gt;
 <instance part="/.9" gate="1" x="76.2" y="148.59"/>
 <instance part="R9" gate="G$1" x="114.3" y="71.12" rot="R90"/>
 <instance part="+3V8" gate="G$1" x="114.3" y="78.74"/>
+<instance part="R10" gate="G$1" x="81.28" y="53.34" rot="R180"/>
 </instances>
 <busses>
 </busses>
@@ -21133,6 +21135,10 @@ Devices GSMBAxx and GMSTBVxx transferred from con-phoenix-508.lbr&lt;br&gt;
 <pinref part="IC1" gate="G$1" pin="VCC"/>
 <wire x1="66.04" y1="55.88" x2="66.04" y2="66.04" width="0.1524" layer="91"/>
 <pinref part="+3V2" gate="G$1" pin="+3V3"/>
+<wire x1="66.04" y1="55.88" x2="73.66" y2="55.88" width="0.1524" layer="91"/>
+<wire x1="73.66" y1="55.88" x2="73.66" y2="53.34" width="0.1524" layer="91"/>
+<pinref part="R10" gate="G$1" pin="2"/>
+<wire x1="73.66" y1="53.34" x2="76.2" y2="53.34" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="+3V7" gate="G$1" pin="+3V3"/>
@@ -21216,9 +21222,11 @@ Devices GSMBAxx and GMSTBVxx transferred from con-phoenix-508.lbr&lt;br&gt;
 <net name="GPIO2" class="0">
 <segment>
 <wire x1="96.52" y1="71.12" x2="99.568" y2="71.12" width="0.1524" layer="91"/>
-<wire x1="99.568" y1="71.12" x2="99.568" y2="72.644" width="0.1524" layer="91"/>
-<wire x1="99.568" y1="72.644" x2="104.14" y2="72.644" width="0.1524" layer="91"/>
 <pinref part="IC1" gate="G$1" pin="GPIO2"/>
+<wire x1="96.52" y1="71.12" x2="104.14" y2="71.12" width="0.1524" layer="91"/>
+<wire x1="104.14" y1="71.12" x2="104.14" y2="53.34" width="0.1524" layer="91"/>
+<pinref part="R10" gate="G$1" pin="1"/>
+<wire x1="104.14" y1="53.34" x2="86.36" y2="53.34" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$11" class="0">

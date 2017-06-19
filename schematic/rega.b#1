@@ -3426,6 +3426,7 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="12.2862" y="-2.856" size="1.778" layer="27" ratio="10"/>
 </element>
 <element name="TR1" library="trafo" package="PT13-2" value="" x="71.12" y="63.5" rot="R270"/>
+<element name="R9" library="rcl" package="R0805" value="10K" x="2" y="-3.5"/>
 </elements>
 <signals>
 <signal name="GND">
@@ -3686,6 +3687,8 @@ design rules under a new name.</description>
 <wire x1="31.95" y1="19.05" x2="31.9" y2="19" width="1.27" layer="16"/>
 <wire x1="31.9" y1="19" x2="31.9" y2="15.43" width="1.27" layer="16"/>
 <wire x1="31.9" y1="15.43" x2="31.75" y2="15.28" width="1.27" layer="16"/>
+<contactref element="R9" pad="2"/>
+<wire x1="2.95" y1="-3.5" x2="11.43" y2="2.54" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$4">
 <contactref element="IC1" pad="2"/>
@@ -3694,16 +3697,6 @@ design rules under a new name.</description>
 <wire x1="54.07" y1="15.97" x2="53.34" y2="15.24" width="1.27" layer="1"/>
 <wire x1="53.34" y1="15.24" x2="51.95" y2="15.24" width="1.27" layer="1"/>
 <wire x1="51.95" y1="15.24" x2="51.76" y2="15.43" width="1.27" layer="1"/>
-</signal>
-<signal name="N$7">
-<contactref element="IC1" pad="4"/>
-<contactref element="S1" pad="4"/>
-<wire x1="58.67" y1="9.19" x2="58.67" y2="11.68" width="1.27" layer="1"/>
-<wire x1="58.67" y1="11.68" x2="59.69" y2="12.7" width="1.27" layer="1"/>
-<wire x1="59.69" y1="12.7" x2="59.69" y2="17.78" width="1.27" layer="1"/>
-<wire x1="59.69" y1="17.78" x2="58.42" y2="19.05" width="1.27" layer="1"/>
-<wire x1="58.42" y1="19.05" x2="52.14" y2="19.05" width="1.27" layer="1"/>
-<wire x1="52.14" y1="19.05" x2="51.76" y2="19.43" width="1.27" layer="1"/>
 </signal>
 <signal name="N$8">
 <contactref element="R5" pad="1"/>
@@ -4009,6 +4002,13 @@ design rules under a new name.</description>
 <contactref element="TR1" pad="4"/>
 <contactref element="TR1" pad="5"/>
 <wire x1="61.1124" y1="48.4886" x2="81.1276" y2="48.4886" width="3.81" layer="16"/>
+</signal>
+<signal name="N$7">
+<contactref element="IC1" pad="4"/>
+<contactref element="R9" pad="1"/>
+<contactref element="S1" pad="4"/>
+<wire x1="58.67" y1="9.19" x2="51.76" y2="19.43" width="0" layer="19" extent="1-1"/>
+<wire x1="1.05" y1="-3.5" x2="51.76" y2="19.43" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 </board>
