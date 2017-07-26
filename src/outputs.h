@@ -12,5 +12,6 @@ public:
   static void disableAuxPump();
   static void setAuxPumpDelay(int);
   static String getOutputs();
+  static bool outputsChanged;
 };
 #endif

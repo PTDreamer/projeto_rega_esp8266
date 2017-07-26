@@ -13,6 +13,10 @@
 #include "time.h"
 
 AsyncWebServer server(80);
+AsyncWebSocket ws("/ws");
+
+bool led = false;
+unsigned long led_last_time = 0;
 fileHandling filehandler;
 time_t getNtpTime() {
   return time(NULL);
@@ -43,6 +47,13 @@ void setupArduinoOTA() {
     else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
     else if (error == OTA_END_ERROR) Serial.println("End Failed");
   });
+}
+
+void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
+  if(type == WS_EVT_CONNECT){
+    outputs::outputsChanged = true;
+    Serial.println("socket connected");
+  }
 }
 
 void schedulesBodyHandler(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
@@ -91,6 +102,8 @@ void setup() {
   pinMode(13, OUTPUT);
   pinMode(14, OUTPUT);
   pinMode(12, OUTPUT);
+  pinMode(5, OUTPUT);
+  digitalWrite(5, LOW);
   digitalWrite(13, LOW);
   digitalWrite(14, LOW);
   digitalWrite(12, LOW);
@@ -121,7 +134,7 @@ void setup() {
   log::writeLog(ESP.getResetReason());
   log::writeLog(ESP.getResetInfo());
 
-  if(!SPIFFS.exists("/data/schedules.json")) {
+  if(!SPIFFS.exists("/www/data/schedules.json")) {
     File f = SPIFFS.open("/www/data/schedules.json", "w");
     f.println("{\"schedules\": [],\"pump_delay\":0}");
     f.close();
@@ -182,9 +195,10 @@ void setup() {
           outputs::disableAuxPump();
       }
     }
-    AsyncResponseStream *response = request->beginResponseStream("application/json");
-    response->print(outputs::getOutputs());
-    request->send(response);
+  //  AsyncResponseStream *response = request->beginResponseStream("application/json");
+  //  response->print(outputs::getOutputs());
+  //  request->send(response);
+    request->send(200);
   });
 
   server.serveStatic("/", SPIFFS, "/www/");
@@ -197,7 +211,8 @@ void setup() {
     Serial.println("Request for not found");
     request->send(404);
   });
-
+  ws.onEvent(onWsEvent);
+  server.addHandler(&ws);
   server.begin();
 
   setupArduinoOTA();
@@ -205,12 +220,29 @@ void setup() {
 }
 
 void loop() {
-  log::writeToFile();
+  //log::writeToFile();
   ArduinoOTA.handle();
 
-  Alarm.delay(0);
+  Alarm.delay(10);
   if(schedulesUpdated && (timeStatus() == timeSet)) {
     filehandler.handleScheduleFile();
     schedulesUpdated = false;
+  }
+  unsigned long time_now = millis();
+  if(time_now - led_last_time > 1000) {
+    led_last_time = time_now;
+    led ^= true;
+    if(led)
+      digitalWrite(5, LOW);
+    else
+      digitalWrite(5, HIGH);
+    Serial.println(timeStatus());
+    String s =  "TIME|{\"hour\" :" + String(hour()) + ",\"minute\" :" + String(minute()) + ",\"seconds\" :" + String(second()) + "}";
+    ws.textAll(s);
+    //ws.printfAll("TIME|{\"hour\" :%u,\"minute\" :%u,\"seconds\" :%u}", hour(), minute(), second());
+  }
+  if(outputs::outputsChanged) {
+    ws.textAll(String("OUTPUTS|") + outputs::getOutputs());
+    outputs::outputsChanged = false;
   }
 }

@@ -18,6 +18,7 @@ void log::writeToFile() {
   }
 }
 void log::writeLog(String txt) {
+  return;
   log::buf[index] = txt;
   if(log::index < 10) ++log::index;
   log::needWriting = true;

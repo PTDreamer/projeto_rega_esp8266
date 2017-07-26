@@ -60,5 +60,5 @@ bool fileHandling::handleScheduleFile() {
     ids = ids + String(id) + String(", ");
     ++number;
   }
-  log::writeLog(String("Loaded:") + String(number) + String(" schedules ") + ids);
+  Serial.println(String("Loaded:") + String(number) + String(" schedules ") + ids);
 }

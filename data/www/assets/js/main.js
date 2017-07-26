@@ -1,8 +1,22 @@
 
 $(document).ready(function(){
     getSchedules();
-    setInterval(function(){periodicEvents();}, 1000);
+  //  setInterval(function(){periodicEvents();}, 1000);
+    websocket = new WebSocket("ws://" + location.host + "/ws");
+    websocket.onmessage = function (event) {
+      console.log(event.data);
+      var res = event.data.split("|");
+      console.log(res[0]);
+      console.log(res[1]);
+      if(res[0] == "OUTPUTS") {
+        getOutputs(res[1]);
+      }
+      else if(res[0] == "TIME") {
+        getTime(res[1]);
+      }
+    }
 });
+
 function getSchedules() {
     $.ajax({
         url: "data/schedules.json",
@@ -78,7 +92,7 @@ $('#zonab').click(function(e) {
 $('#pump').click(function(e) {
     handleOutputClicks($(this), "pump");
 });
-    
+
 function handleOutputClicks(button, zone) {
     var data = {};
     if(button.attr('status') == "on") {
@@ -179,17 +193,17 @@ function showMessage(type, text) {
     }, 10000);
 }
 function periodicEvents() {
-    getTime();
-    getOutputs();
+  //  getTime();
+  //  getOutputs();
 }
-function getTime() {
-    $.getJSON("data/gettime.json",
-        function (json) {
-            $("#timedisplay").text(json.hour + ":" + json.minute + ":" + json.seconds);
-        });
+function getTime(jsons) {
+  var json = JSON.parse(jsons);
+  console.log(json);
+  $("#timedisplay").text(json.hour + ":" + json.minute + ":" + json.seconds);
 }
-function getOutputs() {
-    $.getJSON("data/getoutputs.json", function (json) {
+function getOutputs(jsons) {
+  var json = JSON.parse(jsons);
+  console.log(json);
         if(json.zoneA == "on") {
             $("#zonaa").text("Desligar Zona A");
             $("#zonaa").attr("status", "on");
@@ -211,5 +225,4 @@ function getOutputs() {
             $("#pump").text("Ligar Bomba");
             $("#pump").attr("status", "off");
         }
-    });
 }
