@@ -10,11 +10,13 @@
 #include <ESP8266mDNS.h>
 #include <ArduinoOTA.h>
 #include "log.h"
-#include "time.h"
+#include <TimeLib.h>
+
+#define NTP_MIN_VALID_EPOCH 1533081600
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
-
+uint8_t dd[2000];
 bool led = false;
 unsigned long led_last_time = 0;
 fileHandling filehandler;
@@ -55,31 +57,44 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
     Serial.println("socket connected");
   }
 }
-
 void schedulesBodyHandler(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
+  size_t len2 = len;
+  log::writeLog("len " + String(len) + " index:" + String(index) + " total:" + String(total));
+  if((index + len) > sizeof(dd)) {
+    return;
+  }
+  memcpy(dd + (index), data, len);
+  if((index + len) != total){
+    return;
+  }
+
+  dd[total] = 0;
   if(request->method() == HTTP_POST && request->url() == "/data/schedules.json") {
     if(!index)
       Serial.printf("BodyStart: %u\n", total);
     Serial.printf("%s", (const char*)data);
-    DynamicJsonBuffer jsonBuffer;
-    JsonObject& root = jsonBuffer.parseObject((const char*)data);
-    if (!root.success())
+
+    DynamicJsonDocument root(1501);
+    DeserializationError error = deserializeJson(root, (const char*)dd);
+
+    if (error)
     {
     //  Serial.println("parseObject() failed");
       AsyncResponseStream *response = request->beginResponseStream("application/json");
-      response->print("{ \"status\": \"failure\"}");
+      response->print("{ \"status\": \"failure\", \"code\": \""+String(error.c_str())+"\", \"string\": \""+String((const char*)dd)+"\", \"Lenght\": \""+String(len2)+"\", \"index\": \""+String(index)+"\", \"Total\": \""+String(total)+"\"}");
+      //response->print(error.c_str());
       request->send(response);
       return;
     }
-    if(!(root.containsKey("schedules") && root.containsKey("pump_delay"))) {
+    if(!(root.containsKey("schedules"))) {
   //    Serial.println("Received json does not contain necessary keys");
       AsyncResponseStream *response = request->beginResponseStream("application/json");
-      response->print("{ \"status\": \"failure\"}");
+      response->print("{ \"status\": \"failure\" , \"code\": \"no schedules key\"}");
       request->send(response);
       return;
     }
-    JsonArray& array = root["schedules"].as<JsonArray>();
-    if (!array.success())
+    JsonArray array = root["schedules"].as<JsonArray>();
+    if (false)
     {
     //  Serial.println("schedules array failed");
       AsyncResponseStream *response = request->beginResponseStream("application/json");
@@ -88,7 +103,7 @@ void schedulesBodyHandler(AsyncWebServerRequest *request, uint8_t *data, size_t 
       return;
     }
     File f = SPIFFS.open("/www/data/schedules.json", "w");
-    f.print((const char*)data);
+    f.print((const char*)dd);
     f.close();
     AsyncResponseStream *response = request->beginResponseStream("application/json");
     response->print("{ \"status\": \"success\"}");
@@ -103,11 +118,18 @@ void setup() {
   pinMode(14, OUTPUT);
   pinMode(12, OUTPUT);
   pinMode(5, OUTPUT);
-  digitalWrite(5, LOW);
+  pinMode(4, OUTPUT);
+  pinMode(15, OUTPUT);
+  pinMode(16, OUTPUT);
+ 
   digitalWrite(13, LOW);
   digitalWrite(14, LOW);
   digitalWrite(12, LOW);
-
+  digitalWrite(5, LOW);
+  digitalWrite(4, LOW);
+  digitalWrite(15, LOW);
+  digitalWrite(16, LOW);
+  
   Serial.begin(115200);
   Serial.println("Start!");
   WiFi.hostname("rega2");
@@ -117,10 +139,8 @@ void setup() {
     ESP.reset();
     delay(1000);
   }
-  setSyncProvider(getNtpTime);
-  setSyncInterval(1 * 60);
+ 
 
-  configTime(3600, 0, "us.pool.ntp.org");
   Serial.print("Connected to access point! IP Address=");
   Serial.print(WiFi.localIP());
 
@@ -136,7 +156,7 @@ void setup() {
 
   if(!SPIFFS.exists("/www/data/schedules.json")) {
     File f = SPIFFS.open("/www/data/schedules.json", "w");
-    f.println("{\"schedules\": [],\"pump_delay\":0}");
+    f.println("{\"schedules\": []}");
     f.close();
   }
   //if you get here you have connected to the WiFi
@@ -187,12 +207,30 @@ void setup() {
           outputs::enableChannelB();
         else if(pp->value() == "off")
           outputs::disableChannelB();
-      } else if(p->value() == "pump") {
+      } else if(p->value() == "C") {
         AsyncWebParameter *pp = request->getParam("state");
         if(pp->value() == "on")
-          outputs::enableAuxPump();
+          outputs::enableChannelC();
         else if(pp->value() == "off")
-          outputs::disableAuxPump();
+          outputs::disableChannelC();
+      } else if(p->value() == "D") {
+        AsyncWebParameter *pp = request->getParam("state");
+        if(pp->value() == "on")
+          outputs::enableChannelD();
+        else if(pp->value() == "off")
+          outputs::disableChannelD();
+      } else if(p->value() == "E") {
+        AsyncWebParameter *pp = request->getParam("state");
+        if(pp->value() == "on")
+          outputs::enableChannelE();
+        else if(pp->value() == "off")
+          outputs::disableChannelE();
+      } else if(p->value() == "X") {
+        AsyncWebParameter *pp = request->getParam("state");
+        if(pp->value() == "on")
+          outputs::enableAuxExit();
+        else if(pp->value() == "off")
+          outputs::disableAuxExit();
       }
     }
   //  AsyncResponseStream *response = request->beginResponseStream("application/json");
@@ -217,14 +255,22 @@ void setup() {
 
   setupArduinoOTA();
   ArduinoOTA.begin();
+  setSyncProvider(getNtpTime);
+  setSyncInterval(10);
+  configTime(3600, 0, "us.pool.ntp.org");
+  time_t tnow;
+  while((tnow = time(nullptr)) < NTP_MIN_VALID_EPOCH) {
+    Serial.print(".");
+    delay(300);
+  }
 }
-
 void loop() {
-  //log::writeToFile();
   ArduinoOTA.handle();
+  log::writeToFile();
 
   Alarm.delay(10);
-  if(schedulesUpdated && (timeStatus() == timeSet)) {
+  if(schedulesUpdated && (timeStatus() != timeNotSet)) {
+    log::writeLog(String(timeStatus()));
     filehandler.handleScheduleFile();
     schedulesUpdated = false;
   }

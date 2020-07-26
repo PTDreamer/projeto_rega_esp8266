@@ -8,8 +8,15 @@ public:
   static void disableChannelA();
   static void enableChannelB();
   static void disableChannelB();
-  static void enableAuxPump();
-  static void disableAuxPump();
+  static void enableChannelC();
+  static void disableChannelC();
+  static void enableChannelD();
+  static void disableChannelD();
+  static void enableChannelE();
+  static void disableChannelE();
+  
+  static void enableAuxExit();
+  static void disableAuxExit();
   static void setAuxPumpDelay(int);
   static String getOutputs();
   static bool outputsChanged;

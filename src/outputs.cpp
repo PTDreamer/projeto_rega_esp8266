@@ -27,13 +27,49 @@ void outputs::disableChannelB() {
   log::writeLog("Zone B deactivated");
   outputsChanged = true;
 }
-void outputs::enableAuxPump() {
-  Serial.println("pump enable");
+void outputs::enableChannelC() {
+  Serial.println("channel C enable");
+  digitalWrite(16, HIGH);
+  log::writeLog("Zone C activated");
+  outputsChanged = true;
+}
+void outputs::disableChannelC() {
+  Serial.println("disable channel C");
+  digitalWrite(16, LOW);
+  log::writeLog("Zone C deactivated");
+  outputsChanged = true;
+}
+void outputs::enableChannelD() {
+  Serial.println("channel D enable");
+  digitalWrite(4, HIGH);
+  log::writeLog("Zone D activated");
+  outputsChanged = true;
+}
+void outputs::disableChannelD() {
+  Serial.println("disable channel D");
+  digitalWrite(4, LOW);
+  log::writeLog("Zone D deactivated");
+  outputsChanged = true;
+}
+void outputs::enableChannelE() {
+  Serial.println("channel E enable");
+  digitalWrite(15, HIGH);
+  log::writeLog("Zone E activated");
+  outputsChanged = true;
+}
+void outputs::disableChannelE() {
+  Serial.println("disable channel E");
+  digitalWrite(15, LOW);
+  log::writeLog("Zone E deactivated");
+  outputsChanged = true;
+}
+void outputs::enableAuxExit() {
+  Serial.println("aux enable");
   digitalWrite(12, HIGH);
   outputsChanged = true;
 }
-void outputs::disableAuxPump() {
-  Serial.println("pump disable");
+void outputs::disableAuxExit() {
+  Serial.println("aux disable");
   digitalWrite(12, LOW);
   outputsChanged = true;
 
@@ -42,7 +78,10 @@ void outputs::disableAuxPump() {
 String outputs::getOutputs() {
   String za;
   String zb;
-  String zp;
+  String zc;
+  String zd;
+  String ze;
+  String zx;
   if(digitalRead(13) == HIGH) {
     za = "on";
   } else {
@@ -53,10 +92,25 @@ String outputs::getOutputs() {
   } else {
     zb = "off";
   }
-  if(digitalRead(12) == HIGH) {
-    zp = "on";
+  if(digitalRead(16) == HIGH) {
+    zc = "on";
   } else {
-    zp = "off";
+    zc = "off";
   }
-  return "{\"zoneA\":\"" + za + "\",\"zoneB\":\"" + zb + "\",\"pump\":\"" + zp + "\"}";
+  if(digitalRead(4) == HIGH) {
+    zd = "on";
+  } else {
+    zd = "off";
+  }
+  if(digitalRead(15) == HIGH) {
+    ze = "on";
+  } else {
+    ze = "off";
+  }
+  if(digitalRead(12) == HIGH) {
+    zx = "on";
+  } else {
+    zx = "off";
+  }
+  return "{\"zoneA\":\"" + za + "\",\"zoneB\":\"" + zb + "\",\"zoneC\":\"" + zc + "\",\"zoneD\":\"" + zd + "\",\"zoneE\":\"" + ze + "\",\"aux\":\"" + zx + "\"}";
 }

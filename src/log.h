@@ -10,7 +10,7 @@ public:
   static void deleteLog();
   static void writeToFile();
 private:
-  static String buf[10];
+  static String buf[100];
   static volatile int index;
   static volatile uint8_t needWriting;
 };

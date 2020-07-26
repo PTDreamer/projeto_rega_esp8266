@@ -1,6 +1,6 @@
 #include "log.h"
 
-String log::buf[10];
+String log::buf[100];
 volatile uint8_t log::needWriting = 0;
 volatile int log::index = 0;
 
@@ -18,9 +18,8 @@ void log::writeToFile() {
   }
 }
 void log::writeLog(String txt) {
-  return;
   log::buf[index] = txt;
-  if(log::index < 10) ++log::index;
+  if(log::index < 100) ++log::index;
   log::needWriting = true;
 }
 void log::deleteLog() {

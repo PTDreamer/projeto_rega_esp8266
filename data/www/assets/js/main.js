@@ -36,10 +36,18 @@ function getSchedules() {
                     newRow.find(".zone").val("Zona A");
                 } else if(this.zone == "B") {
                     newRow.find(".zone").val("Zona B");
+                } else if(this.zone == "C") {
+                    newRow.find(".zone").val("Zona C");
+                } else if(this.zone == "D") {
+                    newRow.find(".zone").val("Zona D");
+                } else if(this.zone == "E") {
+                    newRow.find(".zone").val("Zona E");
+                } else if(this.zone == "X") {
+                    newRow.find(".zone").val("Saida Aux");
                 }
                 newRow.find(".timepickeri").timepicker({showMeridian: false});
                 newRow.find(".timepickeri").timepicker('setTime',this.hour + ":" + this.minute);
-                newRow.find(".duration").val(this.duration);
+                newRow.find(".duration").val(this.dur);
                 console.log(this.hour + ":" + this.minute);
                 newRow.show();
             });
@@ -89,8 +97,17 @@ $('#zonaa').click(function(e) {
 $('#zonab').click(function(e) {
     handleOutputClicks($(this), "B");
 });
-$('#pump').click(function(e) {
-    handleOutputClicks($(this), "pump");
+$('#zonac').click(function(e) {
+    handleOutputClicks($(this), "C");
+});
+$('#zonad').click(function(e) {
+    handleOutputClicks($(this), "D");
+});
+$('#zonae').click(function(e) {
+    handleOutputClicks($(this), "E");
+});
+$('#aux').click(function(e) {
+    handleOutputClicks($(this), "X");
 });
 
 function handleOutputClicks(button, zone) {
@@ -112,7 +129,6 @@ $('#save').click(function(e) {
     var hasError = false;
     var sch = {
         "schedules" : [],
-        "pump_delay" : 0
         };
     $("#tablebody").find(".timepicker").each(function (index) {
         console.log("save");
@@ -144,26 +160,35 @@ $('#save').click(function(e) {
     if(hasError) {
         showMessage("error", "Existem erros nos dados que introduziu")
     } else {
-        sch.pump_delay = $("#pumpdelay").val();
         sch.schedules = [];
         $("#tablebody").find("tr").each(function (index) {
             if($(this).attr("id") != "rowtemplate") {
                 var record = {
                             "hour" : 0,
                             "minute" : 0,
-                            "duration" : 0,
+                            "dur" : 0,
                             "zone" : "A"};
                 record.hour = $(this).find(".timepicker").val().split(":")[0];
                 record.minute = $(this).find(".timepicker").val().split(":")[1];
-                record.duration = $(this).find(".duration").val();
+                record.dur = $(this).find(".duration").val();
                 if($(this).find(".zone").val() == "Zona A") {
                     record.zone = "A";
-                } else {
+                } else if($(this).find(".zone").val() == "Zona B") {
                     record.zone = "B";
+                } else if($(this).find(".zone").val() == "Zona C") {
+                    record.zone = "C";
+                } else if($(this).find(".zone").val() == "Zona D") {
+                    record.zone = "D";
+                } else if($(this).find(".zone").val() == "Zona E") {
+                    record.zone = "E";
+                } else if($(this).find(".zone").val() == "Saida Aux") {
+                    record.zone = "X";
                 }
                 sch.schedules.push(record);
             }
         });
+        console.log(sch);
+        console.log(JSON.stringify(sch));
         saveSchedules(sch);
     }
 });
@@ -173,7 +198,7 @@ function showMessage(type, text) {
     var classTxt;
     if(type == "warning") {
         boldText = "Warning";
-        classTxt = alert-warning;
+        classTxt = "alert-warning";
     } else if(type == "error") {
         boldText = "Error";
         classTxt = "alert-danger";
@@ -218,11 +243,32 @@ function getOutputs(jsons) {
             $("#zonab").text("Ligar Zona B");
             $("#zonab").attr("status", "off");
         }
-        if(json.pump == "on") {
-            $("#pump").text("Desligar Bomba");
-            $("#pump").attr("status", "on");
+        if(json.zoneC == "on") {
+            $("#zonac").text("Desligar Zona C");
+            $("#zonac").attr("status", "on");
+        } else if(json.zoneC == "off") {
+            $("#zonac").text("Ligar Zona C");
+            $("#zonac").attr("status", "off");
+        }
+        if(json.zoneD == "on") {
+            $("#zonad").text("Desligar Zona D");
+            $("#zonad").attr("status", "on");
+        } else if(json.zoneD == "off") {
+            $("#zonad").text("Ligar Zona D");
+            $("#zonad").attr("status", "off");
+        }
+        if(json.zoneE == "on") {
+            $("#zonae").text("Desligar Zona E");
+            $("#zonae").attr("status", "on");
+        } else if(json.zoneE == "off") {
+            $("#zonae").text("Ligar Zona E");
+            $("#zonae").attr("status", "off");
+        }
+        if(json.aux == "on") {
+            $("#aux").text("Desligar Saida Auxiliar");
+            $("#aux").attr("status", "on");
         } else if(json.zoneA == "off") {
-            $("#pump").text("Ligar Bomba");
-            $("#pump").attr("status", "off");
+            $("#aux").text("Ligar Saida Auxiliar");
+            $("#aux").attr("status", "off");
         }
 }
