@@ -1,7 +1,6 @@
 
 $(document).ready(function(){
     getSchedules();
-  //  setInterval(function(){periodicEvents();}, 1000);
     websocket = new WebSocket("ws://" + location.host + "/ws");
     websocket.onmessage = function (event) {
       console.log(event.data);
@@ -40,8 +39,6 @@ function getSchedules() {
                     newRow.find(".zone").val("Zona C");
                 } else if(this.zone == "D") {
                     newRow.find(".zone").val("Zona D");
-                } else if(this.zone == "E") {
-                    newRow.find(".zone").val("Zona E");
                 } else if(this.zone == "X") {
                     newRow.find(".zone").val("Saida Aux");
                 }
@@ -102,9 +99,6 @@ $('#zonac').click(function(e) {
 });
 $('#zonad').click(function(e) {
     handleOutputClicks($(this), "D");
-});
-$('#zonae').click(function(e) {
-    handleOutputClicks($(this), "E");
 });
 $('#aux').click(function(e) {
     handleOutputClicks($(this), "X");
@@ -179,8 +173,6 @@ $('#save').click(function(e) {
                     record.zone = "C";
                 } else if($(this).find(".zone").val() == "Zona D") {
                     record.zone = "D";
-                } else if($(this).find(".zone").val() == "Zona E") {
-                    record.zone = "E";
                 } else if($(this).find(".zone").val() == "Saida Aux") {
                     record.zone = "X";
                 }
@@ -217,10 +209,6 @@ function showMessage(type, text) {
         html.remove();
     }, 10000);
 }
-function periodicEvents() {
-  //  getTime();
-  //  getOutputs();
-}
 function getTime(jsons) {
   var json = JSON.parse(jsons);
   console.log(json);
@@ -256,13 +244,6 @@ function getOutputs(jsons) {
         } else if(json.zoneD == "off") {
             $("#zonad").text("Ligar Zona D");
             $("#zonad").attr("status", "off");
-        }
-        if(json.zoneE == "on") {
-            $("#zonae").text("Desligar Zona E");
-            $("#zonae").attr("status", "on");
-        } else if(json.zoneE == "off") {
-            $("#zonae").text("Ligar Zona E");
-            $("#zonae").attr("status", "off");
         }
         if(json.aux == "on") {
             $("#aux").text("Desligar Saida Auxiliar");

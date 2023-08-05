@@ -1,7 +1,7 @@
 #ifndef fileHandling_H
 #define  fileHandling_H
 
-#include <FS.h>                   //this needs to be first, or it all crashes and burns...
+#include <LittleFS.h>
 #include <ArduinoJson.h>
 #include "outputs.h"
 

@@ -1,11 +1,11 @@
 #include "fileHandling.h"
 #include "log.h"
 bool fileHandling::handleScheduleFile() {
-  if (!SPIFFS.exists("/www/data/schedules.json")) {
+  if (!LittleFS.exists("/www/data/schedules.json")) {
     Serial.println("schedules.json file doesnt exist");
     return false;
   }
-  File schedulesFile = SPIFFS.open("/www/data/schedules.json", "r");
+  File schedulesFile = LittleFS.open("/www/data/schedules.json", "r");
   if(!schedulesFile) {
     Serial.println("Could not open schedules.json for reading");
     return false;
@@ -16,7 +16,7 @@ bool fileHandling::handleScheduleFile() {
   std::unique_ptr<char[]> buf(new char[size]);
   schedulesFile.readBytes(buf.get(), size);
   
-  DynamicJsonDocument root(1024);
+  DynamicJsonDocument root(2048);
   DeserializationError error = deserializeJson(root, buf.get());
   
   if (!error) {
@@ -54,10 +54,6 @@ bool fileHandling::handleScheduleFile() {
       Serial.println("ZONE D");
       enable = outputs::enableChannelD;
       disable = outputs::disableChannelD;
-    } else if(value["zone"].as<String>() == "E") {
-      Serial.println("ZONE E");
-      enable = outputs::enableChannelE;
-      disable = outputs::disableChannelE;
     } else if(value["zone"].as<String>() == "X") {
       Serial.println("aux out");
       enable = outputs::enableAuxExit;
@@ -76,4 +72,5 @@ bool fileHandling::handleScheduleFile() {
   }
   Serial.println(String("Loaded:") + String(number) + String(" schedules ") + ids);
   log::writeLog(String("Loaded:") + String(number) + String(" schedules ") + ids);
+  return true;
 }

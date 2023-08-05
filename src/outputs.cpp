@@ -29,13 +29,13 @@ void outputs::disableChannelB() {
 }
 void outputs::enableChannelC() {
   Serial.println("channel C enable");
-  digitalWrite(16, HIGH);
+  digitalWrite(15, HIGH);
   log::writeLog("Zone C activated");
   outputsChanged = true;
 }
 void outputs::disableChannelC() {
   Serial.println("disable channel C");
-  digitalWrite(16, LOW);
+  digitalWrite(15, LOW);
   log::writeLog("Zone C deactivated");
   outputsChanged = true;
 }
@@ -49,18 +49,6 @@ void outputs::disableChannelD() {
   Serial.println("disable channel D");
   digitalWrite(4, LOW);
   log::writeLog("Zone D deactivated");
-  outputsChanged = true;
-}
-void outputs::enableChannelE() {
-  Serial.println("channel E enable");
-  digitalWrite(15, HIGH);
-  log::writeLog("Zone E activated");
-  outputsChanged = true;
-}
-void outputs::disableChannelE() {
-  Serial.println("disable channel E");
-  digitalWrite(15, LOW);
-  log::writeLog("Zone E deactivated");
   outputsChanged = true;
 }
 void outputs::enableAuxExit() {
@@ -80,7 +68,6 @@ String outputs::getOutputs() {
   String zb;
   String zc;
   String zd;
-  String ze;
   String zx;
   if(digitalRead(13) == HIGH) {
     za = "on";
@@ -92,7 +79,7 @@ String outputs::getOutputs() {
   } else {
     zb = "off";
   }
-  if(digitalRead(16) == HIGH) {
+  if(digitalRead(15) == HIGH) {
     zc = "on";
   } else {
     zc = "off";
@@ -102,15 +89,10 @@ String outputs::getOutputs() {
   } else {
     zd = "off";
   }
-  if(digitalRead(15) == HIGH) {
-    ze = "on";
-  } else {
-    ze = "off";
-  }
   if(digitalRead(12) == HIGH) {
     zx = "on";
   } else {
     zx = "off";
   }
-  return "{\"zoneA\":\"" + za + "\",\"zoneB\":\"" + zb + "\",\"zoneC\":\"" + zc + "\",\"zoneD\":\"" + zd + "\",\"zoneE\":\"" + ze + "\",\"aux\":\"" + zx + "\"}";
+  return "{\"zoneA\":\"" + za + "\",\"zoneB\":\"" + zb + "\",\"zoneC\":\"" + zc + "\",\"zoneD\":\"" + zd + "\",\"aux\":\"" + zx + "\"}";
 }

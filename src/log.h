@@ -1,7 +1,7 @@
 #ifndef log_H
 #define  log_H
 
-#include <FS.h>
+#include <LittleFS.h>
 #include "TimeLib.h"
 
 class log {

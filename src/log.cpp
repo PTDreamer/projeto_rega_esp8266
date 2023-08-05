@@ -6,7 +6,7 @@ volatile int log::index = 0;
 
 void log::writeToFile() {
   if(log::needWriting) {
-    File f = SPIFFS.open("/www/data/log.html", "a");
+    File f = LittleFS.open("/www/data/log.html", "a");
     for(int x = 0; x < index ; ++x) {
       char charBuf[log::buf[x].length()+1];
       log::buf[x].toCharArray(charBuf, log::buf[x].length() + 1);
@@ -23,6 +23,6 @@ void log::writeLog(String txt) {
   log::needWriting = true;
 }
 void log::deleteLog() {
-  File f =SPIFFS.open("/www/data/log.html", "w");
+  File f =LittleFS.open("/www/data/log.html", "w");
   f.close();
 }
